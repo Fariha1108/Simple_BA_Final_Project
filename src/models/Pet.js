@@ -3,7 +3,8 @@ const { Schema, model } = require('mongoose');
 const petSchema = new Schema({
     petname: String,
     animal: String,
-    animalAge: Number
+    animalAge: Number,
+    convertedAge: Number
 }, { timestamps: true })
 
 // gibt mir direkt nach dem speichern eine nachricht

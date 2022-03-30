@@ -5,7 +5,6 @@ const crypto = require('crypto');
 //console.log('Key mit crypto.randomBytes: ' + crypto.randomBytes(64).toString('hex'));
 
 const { Schema, model } = require('mongoose');
-const { addressSchema } = require('./UserAddress');
 const { petSchema } = require('./Pet');
 
 const userSchema = new Schema({
@@ -15,8 +14,7 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    pet: petSchema,
-    address: addressSchema
+    pet: petSchema
 }, { timestamps: true })
 
 // gibt mir direkt nach dem speichern eine nachricht

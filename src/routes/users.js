@@ -3,7 +3,7 @@ const router = express.Router();
 const validator = require('express-validator');
 const userAdmin = require('../middleware/admin');
 const authorize = require('../middleware/authorize');
-const  { newUser, getUsers, existedUser }  = require('../controllers/users');
+const  { newUser, getUsers, existedUser, logoutUser }  = require('../controllers/users');
 
 /*
     routen für user
@@ -34,5 +34,8 @@ router.route('/signup')
 
 router.route('/login')
 .post( existedUser )
+
+router.route('/logout')
+.post(logoutUser)
 
 module.exports = router;

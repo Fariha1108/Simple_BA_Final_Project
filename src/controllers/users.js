@@ -1,41 +1,50 @@
 const User = require('../models/User');
 const validator = require('express-validator');
 const { accessToken } = require('../utils/accessToken');
+//const { convertDogAge, convertSeaPigAge, convertCatAge, convertCockatielAge } = require('../middleware/convertPetsAge');
 
-const newUser = (req, res) =>
-{
+const newUser = (req, res) => {
+
+    let animalAgeInHumanYears;
+
     const { username, password, admin } = req.body;
 
     const errors = validator.validationResult(req).errors;
-    console.log(errors);  
-    
+    console.log(errors);
+
     if (errors.length > 0) {
         return res.status(400).json({ errors });
     };
     // ansonsten überspringen
 
-    const createUser = new User();
+    createUser = new User();
     createUser.username = username;
     createUser.password = createUser.hashPassword(password);
     createUser.admin = admin;
-    createUser.pet = {
-        petname,
-        animal,
-        animalAge
-    } = req.body;
-    createUser.address = {
-        streetAndNumber,
-        postcode,
-        city
-    } = req.body;
+
+    if (req.body.animal === 'cat') {
+        let { animalAge } = req.body;
+
+        if (animalAge <= 15) {
+
+
+            createUser.pet = {
+                petname,
+                animal,
+                animalAge,
+                animalAgeInHumanYears = animalAge * 7
+            } = req.body;
+        }
+        console.error('The age of your pet is not correct!');
+    }
 
     // in die datenbank speichern
-    createUser.save((err, user, ) => {
+    createUser.save((err, user) => {
         if (err) {
             return res.status(400).json({ success: false, message: "Something is wrong...!" });
         }
 
-        return res.status(200).json({ success: true, data: user });
+        return res.status(200).json({ success: true, data: user, animalAgeInHumanYears });
     });
 };
 
@@ -50,51 +59,55 @@ const getUsers = (req, res) => {
     });
 };
 
-const existedUser = (req, res) =>
-{
+const existedUser = (req, res) => {
     const errorMessage = 'Username or Password incorrect!';
 
     const { username, password } = req.body;
-    
-    User.findOne({ username }).then(foundUser =>
-    {
-        if(foundUser)
-        {
+
+    User.findOne({ username }).then(foundUser => {
+        if (foundUser) {
             const token = accessToken({ username: foundUser.username });
 
-            if(foundUser.comparePassword(password))
-            {
+            if (foundUser.comparePassword(password)) {
                 res.cookie('access_token', token, {
-                        // httpOnly: true,
-                        maxAge: 24 * 60 * 60
-                    })
+                    // httpOnly: true,
+                    maxAge: 24 * 60 * 60
+                })
                     .status(200)
                     .json({
                         success: true,
-                        message: `User '${ foundUser.username }' is logged in!`
+                        message: `User '${foundUser.username}' is logged in!`
                     });
             }
-            else
-            {
+            else {
                 res.status(200).json({
                     success: false,
-                    errors: [ errorMessage ]
+                    errors: [errorMessage]
                 });
             }
         }
-        else
-        {
+        else {
             res.status(200).json({
                 success: false,
-                errors: [ errorMessage ]
+                errors: [errorMessage]
             });
         }
     });
 };
 
+const logoutUser = (req, res) => {
+    return res
+        .clearCookie('access_token')
+        .status(200)
+        .json({
+            success: true,
+            message: 'User logged out'
+        });
+};
 
 module.exports = {
     newUser,
     getUsers,
-    existedUser
+    existedUser,
+    logoutUser
 };
